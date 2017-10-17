@@ -15,6 +15,8 @@ sudo usermod -aG sudo jonathan
 sudo usermod -aG www-data jonathan
 ```
 
+^-- ***UPDATE - User probably shouldn't be a member of the group `www-data`, especially if taking ownership of the `/var/www/bolt` folder in steps below.***
+
 ## Install composer
 
 Based on: https://getcomposer.org/download/  
@@ -45,7 +47,7 @@ sudo apt-get install php-pdo php-gmp php-json php-mbstring php-posix php-xml php
 sudo apt-get install php7.0-zip
 ```
 
-Modify `dir.conf` to look for PHP files first:
+Modify `dir.conf` to look for `PHP` files first:
 
 ```
 sudo nano /etc/apache2/mods-enabled/dir.conf
@@ -88,7 +90,7 @@ sudo systemctl restart apache2
 sudo apache2ctl configtest
 ```
 
-(There's warning that the "bolt" sub-folder does not exist yet.)
+(There's warning that the "bolt" sub-folder does not exist yet, but that will be fixed below.)
 
 ## Install Bolt
 
@@ -104,7 +106,7 @@ sudo chmod 775 -R bolt
 cd bolt
 ```
 
-^-- ***UPDATE - This is not correct, trying the permissions below:***
+^-- ***UPDATE - This is not correct, use the permissions below:***
 
 ```
 sudo mkdir /var/www/bolt
@@ -157,7 +159,7 @@ cd /var/www
 sudo chown www-data:www-data -R bolt
 ```
 
-^- Don't...!
+^-- ***UPDATE - Don't... this is not correct.***
 
 Test in a browser:
 
@@ -165,7 +167,7 @@ You should be taken straight to the "firstuser" setup wizard.
 
 ## Upgrade with Composer
 
-Rename the `.dist` distribution file.s
+Rename the `.dist` distribution files.
 
 ```
 cd /var/www/bolt
@@ -173,7 +175,7 @@ sudo mv composer.json.dist composer.json
 sudo mv composer.lock.dist composer.lock
 ```
 
-Then run with:
+Then run:
 
 ```
 composer update
