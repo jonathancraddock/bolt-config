@@ -6,21 +6,18 @@ This document is a series of notes and config made while testing Bolt on a local
 
 New VM, 1 cpu, 512mb, 20gb SSD. Install Ubuntu 16 with usual defaults.
 
-LAMP, Standard Utils, OpenSSH
+LAMP, Standard Utils, OpenSSH. Named it "bolttest" in DNS. Reboot. Test in browser. Setup PuTTY. Connect and run an apt-get update / upgrade.
 
-Named it "bolttest" in DNS. Reboot. Test in browser.
+May require one or both of the following:
 
-Setup PuTTY.
-
-update / upgrade
-
+```
 sudo usermod -aG sudo jonathan
-and/or
 sudo usermod -aG www-data jonathan
+```
 
 ## Install composer
 
-Based on: https://getcomposer.org/download/
+Based on: https://getcomposer.org/download/  
 And: https://getcomposer.org/doc/00-intro.md#installation-linux-unix-osx
 
 ```
@@ -48,19 +45,19 @@ sudo apt-get install php-pdo php-gmp php-json php-mbstring php-posix php-xml php
 sudo apt-get install php7.0-zip
 ```
 
-**Modify dir.conf to look for PHP files first:**
+Modify `dir.conf` to look for PHP files first:
 
 ```
 sudo nano /etc/apache2/mods-enabled/dir.conf
 ```
 
-**Enable Apache rewrite:**
+Enable Apache rewrite:
 
 ```
 sudo a2enmod rewrite
 ```
 
-Point Apache at the bolt/public folder:
+Point Apache at the `bolt/public` folder:
 
 ```
 cd /etc/apache2/sites-available
@@ -97,7 +94,7 @@ sudo apache2ctl configtest
 
 Based on: https://docs.bolt.cm/3.3/installation/quick-install
 
-Create a "bolt" sub-folder under /var/www/...
+Create a `bolt` sub-folder under `/var/www/...`
 
 ```
 sudo mkdir /var/www/bolt
@@ -107,7 +104,7 @@ sudo chmod 775 -R bolt
 cd bolt
 ```
 
-^-- UPDATE - This is not correct, trying the permissions below:
+^-- ***UPDATE - This is not correct, trying the permissions below:***
 
 ```
 sudo mkdir /var/www/bolt
@@ -120,17 +117,22 @@ cd bolt
 
 ## Install Bolt using "quick install":
 
+```
 curl -O https://bolt.cm/distribution/bolt-latest.tar.gz
 tar -xzf bolt-latest.tar.gz --strip-components=1
 php app/nut init
+```
 
 In this example:
 
+```
 Welcome to Bolt! - version 3.3.6.
+```
 
 Set permissions:
-Create a script, eg/ setperm.sh, in bolt folder.
+Create a script, eg/ `setperm.sh` in bolt folder.
 
+```
 for dir in app/cache/ app/database/ public/thumbs/ ; do
   find $dir -type d -print0 | xargs -0 chmod u+rwx,g+rwxs,o+rx-w
   find $dir -type f -print0 | xargs -0 chmod u+rw-x,g+rw-x,o+r-wx > /dev/null 2>&1
@@ -140,15 +142,20 @@ for dir in app/config/ extensions/ public/extensions/ public/files/ public/theme
   find $dir -type d -print0 | xargs -0 chmod u+rwx,g+rwxs,o+rx-w
   find $dir -type f -print0 | xargs -0 chmod u+rw-x,g+rw-x,o+r-wx > /dev/null 2>&1
 done
+```
 
 Save it and run as follows:
 
+```
 sudo sh ./setperm.sh
+```
 
 Reset ownership of Bolt folders:
 
+```
 cd /var/www
 sudo chown www-data:www-data -R bolt
+```
 
 ^- Don't...!
 
@@ -156,10 +163,18 @@ Test in a browser:
 
 You should be taken straight to the "firstuser" setup wizard.
 
-Upgrade with Composer:
+## Upgrade with Composer
 
+Rename the `.dist` distribution file.s
+
+```
 cd /var/www/bolt
-sudo mv composer.json.dist  composer.json
+sudo mv composer.json.dist composer.json
 sudo mv composer.lock.dist composer.lock
+```
 
+Then run with:
+
+```
 composer update
+```
