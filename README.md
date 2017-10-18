@@ -34,6 +34,15 @@ php -r "unlink('composer-setup.php');"
 sudo mv composer.phar /usr/local/bin/composer
 ```
 
+On a 512mb VM, may need a swapfile:
+
+```
+sudo /bin/dd if=/dev/zero of=/var/swap.1 bs=1M count=1024
+sudo /sbin/mkswap /var/swap.1
+sudo /sbin/swapon /var/swap.1
+sudo chmod 0600 /var/swap.1
+```
+
 Composer will now run globally.
 
 ## Bolt Prerequisites
