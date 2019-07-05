@@ -13,7 +13,7 @@ sudo a2enmod php7.2
 sudo systemctl restart apache2
 ```
 
-Install composer.
+## Install composer
 
 ```bash
 php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
@@ -31,4 +31,37 @@ To enable composer to run globally:
 sudo mv composer.phar /usr/local/bin/composer
 
 composer -V
+```
+^- *Note the UPPER-case "V" because a lower-case "v" is rather more verbose...*
+
+## PHP Dependencies
+
+Bolt has the following PHP prerequisites, and I've highlighted the ones that don't appear to be installed by default on my 18.04 VM.
+
+```php
+<?php
+  phpinfo(INFO_MODULES);
+?>
+```
+^- *A simple PHP script will show what's currently enabled.*
+
+* pdo
+* mysqlnd (to use MySQL as a database)
+* pgsql (to use PostgreSQL as a database)
+* openssl
+* **curl**
+* **gd**
+* **intl** (optional but recommended)
+* json
+* **mbstring** (optional but recommended)
+* **opcache** (optional but recommended)
+* posix
+* **xml**
+* fileinfo
+* exif
+* **zip**
+
+```bash
+sudo apt-get update
+sudo apt-get install php7.2-curl php7.2-gd php7.2-intl php7.2-mbstring php7.2-opcache php7.2-xml php7.2-zip
 ```
