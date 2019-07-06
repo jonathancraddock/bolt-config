@@ -65,3 +65,40 @@ Bolt has the following PHP prerequisites, and I've highlighted the ones that don
 sudo apt-get update
 sudo apt-get install php7.2-curl php7.2-gd php7.2-intl php7.2-mbstring php7.2-opcache php7.2-xml php7.2-zip
 ```
+
+## New Composer Project
+
+Navigate to "parent" folder, in this case:
+
+`cd /var/www`
+
+Run the Composer new project script, for example:
+
+```bash
+sudo mkdir /var/www/bolt
+cd /var/www
+sudo chown jonathan:www-data -R bolt
+find . -type d -exec sudo chmod 0755 {} \;
+find . -type f -exec sudo chmod 0644 {} \;
+cd bolt
+```
+
+Next, carry out a "quick install".
+
+```bash
+curl -O https://bolt.cm/distribution/bolt-latest.tar.gz
+tar -xzf bolt-latest.tar.gz --strip-components=1
+php app/nut init
+
+$ Welcome to Bolt! - version 3.6.9.
+```
+
+FOOTNOTE:
+Failing, without a swapfile:
+```bash
+sudo /bin/dd if=/dev/zero of=/var/swap.1 bs=1M count=1024
+sudo /sbin/mkswap /var/swap.1
+sudo /sbin/swapon /var/swap.1
+sudo chmod 0600 /var/swap.1
+```
+  
