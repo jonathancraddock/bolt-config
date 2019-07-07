@@ -23,7 +23,12 @@ php -r "if (hash_file('sha384', 'composer-setup.php') === '48e3236262b34d30969dc
 sudo php composer-setup.php
 ```
 
-^-- note that earlier NodeRED install created a .config folder with very restricted permissions, hence the sudo.
+^-- note that earlier NodeRED install created a .config folder with very restricted permissions, hence the sudo, but I'd be concerned this may cause problems later. Reset ownwership of ~/.composer folder.
+
+```bash
+sudo chown jonathan:jonathan -R ~/.composer
+sudo chmod 744 -R ~/.composer
+```
 
 To enable composer to run globally:
 
@@ -64,19 +69,46 @@ Bolt has the following PHP prerequisites, and I've highlighted the ones that don
 ```bash
 sudo apt-get update
 sudo apt-get install php7.2-curl php7.2-gd php7.2-intl php7.2-mbstring php7.2-opcache php7.2-xml php7.2-zip
+
+sudo apt-get install sqlite3
+sudo apt-get install php7.2-sqlite3
+
+cd /etc/php/7.2/apache2
+sudo nano php.ini
+```
+^- *Later in install process, realised SQLite was missed...*
+
+Uncomment the following lines in php.ini
+
+```bash
+extension=curl
+extension=fileinfo
+extension=gd2
+...
+extension=mbstring
+extension=exif
+...
+extension=openssl
+...
+extension=pdo_sqlite
+...
+extension=sqlite3
 ```
 
-## New Composer Project
+Restart Apache.
+
+`sudo systemctl restart apache2`
+
+## New Bolt Project / Update with Composer
 
 Navigate to "parent" folder, in this case:
 
 `cd /var/www`
 
-Run the Composer new project script, for example:
+Create a folder with appropriate permissions:
 
 ```bash
 sudo mkdir /var/www/bolt
-cd /var/www
 sudo chown jonathan:www-data -R bolt
 find . -type d -exec sudo chmod 0755 {} \;
 find . -type f -exec sudo chmod 0644 {} \;
@@ -93,8 +125,30 @@ php app/nut init
 $ Welcome to Bolt! - version 3.6.9.
 ```
 
+Create a `setperm.sh` permissions script in the bolt folder:
+
+`nano setperm.sh`
+
+```bash
+cd /var/www/bolt
+
+for dir in app/cache/ app/database/ public/thumbs/ ; do
+  find $dir -type d -print0 | xargs -0 chmod u+rwx,g+rwxs,o+rx-w
+  find $dir -type f -print0 | xargs -0 chmod u+rw-x,g+rw-x,o+r-wx > /dev/null 2>&1
+done
+
+for dir in app/config/ extensions/ public/extensions/ public/files/ public/theme/ ; do
+  find $dir -type d -print0 | xargs -0 chmod u+rwx,g+rwxs,o+rx-w
+  find $dir -type f -print0 | xargs -0 chmod u+rw-x,g+rw-x,o+r-wx > /dev/null 2>&1
+done
+
+cd /var/www
+sudo chown jonathan:www-data -R bolt
+```
+
 FOOTNOTE:
-Failing, without a swapfile:
+Composer appears to be failing without a swapfile:
+
 ```bash
 sudo /bin/dd if=/dev/zero of=/var/swap.1 bs=1M count=1024
 sudo /sbin/mkswap /var/swap.1
@@ -102,3 +156,61 @@ sudo /sbin/swapon /var/swap.1
 sudo chmod 0600 /var/swap.1
 ```
   
+Update Bolt install with composer:
+
+```bash
+composer update
+```
+
+## Create a virtual host:
+
+Modify `dir.conf` to look for `PHP` files first:
+
+```
+sudo nano /etc/apache2/mods-enabled/dir.conf
+```
+
+Enable Apache rewrite:
+
+```bash
+sudo a2enmod rewrite
+```
+
+Edit a new virtual host.
+
+```bash
+cd /etc/apache2/sites-available
+sudo nano bolt.conf
+```
+
+Point Apache at the `bolt/public` folder:
+
+```bash
+<VirtualHost *:80>
+        ServerAdmin webmaster@localhost
+        ServerName bolt.example.com
+
+        DocumentRoot /var/www/bolt/public
+
+        <Directory "/var/www/bolt/public">
+          AllowOverride All
+        </Directory>
+
+        ErrorLog ${APACHE_LOG_DIR}/error.log
+        CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+```
+
+Test the config, enable the site and restart Apache:
+
+```bash
+sudo apache2ctl configtest
+sudo a2ensite bolt.conf
+sudo systemctl restart apache2
+```
+
+At this stage it should be possible to (insecurely) access the Bolt welcome wizard.
+
+
+
+
