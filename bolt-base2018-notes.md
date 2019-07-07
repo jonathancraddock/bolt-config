@@ -2,6 +2,13 @@
 
 The Base-2018 theme is a nice looking default template. The following are some notes and memory jogs for future reference.
 
+#### Links
+
+* Bulma (flexbox css framework) - https://bulma.io/
+* Twig (template engine) - https://twig.symfony.com/doc/2.x/
+* Bolt (docs) - https://docs.bolt.cm/3.6/getting-started/introduction
+* Font Awesome (icons) - https://fontawesome.com/
+
 ### Wireframes
 
 There's a set of wireframes available under: File Management... View Edit Templates.
