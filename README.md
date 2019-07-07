@@ -2,6 +2,8 @@
 
 This document is a series of notes and config made while testing Bolt on a local VM. I'd previously always used the so called "flattened" installation process, but would perfer to use "composer". These are some draft notes for my future reference.
 
+> These notes are a couple of years old and contain several errors. There's a more recent set of notes here -> https://github.com/jonathancraddock/bolt-config/blob/master/bolt-july2019.md.
+
 ## VM Basic Setup
 
 New VM, 1 cpu, 512mb, 20gb SSD. Install Ubuntu 16 with usual defaults.
