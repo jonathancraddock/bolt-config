@@ -14,4 +14,10 @@ The "Aside" on the homepage features an "about" block. The title can be anything
 
 Opening the homepage you're greeted with "A Sample Site, The amazing payoff goes here". This legend comes from: Configuration... Main configuration. The "sitename" value will also be added to the left-side of the Navbar.
 
+The hero background image is the image associated with the "homepage" page. (In its "large" homepage size, it's 615px tall?)
 
+### Navbar Menu
+
+Menu is configured in a YAML file: Configuration... Menu set up.
+
+See: https://docs.bolt.cm/configuration/menus
