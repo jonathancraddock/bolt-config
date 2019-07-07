@@ -1,4 +1,4 @@
-## LOG
+## LOG - Setting up Bolt on a Digital Ocean droplet
 
 VM running Ubuntu 18.04 LTS and Apache. (Also has a NodeRED install via an Apache reverse proxy.)
 
@@ -209,8 +209,13 @@ sudo a2ensite bolt.conf
 sudo systemctl restart apache2
 ```
 
-At this stage it should be possible to (insecurely) access the Bolt welcome wizard.
+At this stage it should be possible to (insecurely) access the Bolt welcome wizard. Now set up Let's Encrypt.
 
+```bash
+sudo add-apt-repository ppa:certbot/certbot
+sudo apt install python-certbot-apache
 
+sudo certbot --apache -d bolt.example.com
+```
 
-
+Confirm config in `bolt-le-ssl.conf`.
