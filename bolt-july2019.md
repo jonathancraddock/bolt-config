@@ -1,6 +1,8 @@
 ## LOG - Setting up Bolt on a Digital Ocean droplet
 
-VM running Ubuntu 18.04 LTS and Apache. (Also has a NodeRED install via an Apache reverse proxy, which let to a couple of issues with folder permissions that I suspect wouldn't have occured on a clean install.)
+VM running Ubuntu 18.04 LTS and Apache. (The same machine is also running NodeRED via an Apache reverse proxy, which led to a couple of issues with folder permissions that I suspect might not have occured on a clean install.)
+
+## Install PHP
 
 Needed to add PHP to the VM. Following suggestions in this guide:
 https://www.linuxbabe.com/ubuntu/install-lamp-stack-ubuntu-18-04-server-desktop
@@ -19,9 +21,9 @@ php -r "if (hash_file('sha384', 'composer-setup.php') === '48e3236262b34d30969dc
 sudo php composer-setup.php
 ```
 
-^-- note that earlier NodeRED install created a .config folder with very restricted permissions, and composer wouldn't install without the `sudo`, but I'd be concerned this may cause problems later.
+^-- note that earlier NodeRED install had created a .config folder with limited permissions, and Composer wouldn't install without the `sudo`, but I'd be concerned this may cause problems later.
 
->See note above!! When running `composer update` in a later step, I found it was unable to write to its own cache folder in my home folder, since `.composer` was now owned by root. (Presumably a result of the earlier `sudo` command?) Reset ownwership of folder as follows, and it now runs correctly.
+>See note above!! When running `composer update` in a later step, I found it was unable to write to its own cache folder in my home folder, since `.composer` was now owned by root. (Presumably a result of the earlier `sudo` command?) Reset ownership of folder as follows, and it now runs correctly.
 >
 >```bash
 >sudo chown jonathan:jonathan -R ~/.composer
@@ -37,7 +39,7 @@ composer -V
 ```
 ^- *Note the UPPER-case "V" because a lower-case "v" is rather more verbose...*
 
-## PHP Dependencies
+## Bolt's PHP Dependencies
 
 Bolt has the following PHP prerequisites, and I've highlighted the ones that don't appear to be installed by default on my 18.04 VM.
 
@@ -73,7 +75,7 @@ sudo apt-get install php7.2-sqlite3
 cd /etc/php/7.2/apache2
 sudo nano php.ini
 ```
-^- *Later in install process, realised SQLite was missed and it should probably have been installed at this stage. Note the edits to `php.ini` below...*
+^- *Later in install process, I realised SQLite was missed, and it should probably have been installed at this stage. Note the edits to `php.ini` below...*
 
 Uncomment the following lines in php.ini
 
@@ -122,7 +124,7 @@ php app/nut init
 $ Welcome to Bolt! - version 3.6.9.
 ```
 
-Create a `setperm.sh` permissions script in the bolt folder:
+Create a `setperm.sh` permissions script in the bolt folder.
 
 `nano setperm.sh`
 
@@ -144,7 +146,7 @@ sudo chown jonathan:www-data -R bolt
 ```
 
 FOOTNOTE:
-Composer appears to be failing without a swapfile:
+Composer appears to be failing without a swapfile.
 
 ```bash
 sudo /bin/dd if=/dev/zero of=/var/swap.1 bs=1M count=1024
@@ -159,7 +161,7 @@ Update Bolt install with composer:
 composer update
 ```
 
-## Create a virtual host:
+## Create an Apache virtual host:
 
 Modify `dir.conf` to look for `PHP` files first:
 
@@ -206,7 +208,7 @@ sudo a2ensite bolt.conf
 sudo systemctl restart apache2
 ```
 
-At this stage it should be possible to (insecurely) access the Bolt welcome wizard. Now set up Let's Encrypt.
+At this stage it should be possible to (insecurely) access the Bolt welcome wizard. Set up Let's Encrypt before proceeding.
 
 ```bash
 sudo add-apt-repository ppa:certbot/certbot
@@ -215,7 +217,7 @@ sudo apt install python-certbot-apache
 sudo certbot --apache -d bolt.example.com
 ```
 
-Confirm config in `bolt-le-ssl.conf`. A few related notes here -> https://github.com/jonathancraddock/NodeRED-Apache-ReverseProxy and copied the modeified config below. I specified slightly more relaxed ciphers which means the site should be accessible to some slightly older versions of IE and Safari. Still scoring "A+" in the Globalsign SSL Checker, although the cipher score has dropped to 90%. :-(
+Confirm config in `bolt-le-ssl.conf`. A few related notes here -> https://github.com/jonathancraddock/NodeRED-Apache-ReverseProxy and I've copied a sample modified config below. I specified slightly more relaxed ciphers which means the site should be accessible to some older versions of IE and Safari. Still scoring "A+" in the Globalsign SSL Checker, although the cipher score has dropped to 90%. :-(
 
 ```bash
 <IfModule mod_ssl.c>
@@ -253,3 +255,5 @@ Include /etc/letsencrypt/options-ssl-apache.conf
 </VirtualHost>
 </IfModule>
 ```
+
+The Bolt first-user wizard can now be run securely, so went ahead and created a first/admin user.
