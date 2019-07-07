@@ -12,4 +12,6 @@ The "Aside" on the homepage features an "about" block. The title can be anything
 
 ### Hero
 
-Opening the homepage you're greeted with "A Sample Site, The amazing payoff goes here". This legend comes from: Configuration... Main configuration.
+Opening the homepage you're greeted with "A Sample Site, The amazing payoff goes here". This legend comes from: Configuration... Main configuration. The "sitename" value will also be added to the left-side of the Navbar.
+
+
