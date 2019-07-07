@@ -1,15 +1,13 @@
 ## LOG - Setting up Bolt on a Digital Ocean droplet
 
-VM running Ubuntu 18.04 LTS and Apache. (Also has a NodeRED install via an Apache reverse proxy.)
+VM running Ubuntu 18.04 LTS and Apache. (Also has a NodeRED install via an Apache reverse proxy, which let to a couple of issues with folder permissions that I suspect wouldn't have occured on a clean install.)
 
-Need to add PHP. Following suggestions in this guide:
+Needed to add PHP to the VM. Following suggestions in this guide:
 https://www.linuxbabe.com/ubuntu/install-lamp-stack-ubuntu-18-04-server-desktop
 
 ```bash
 sudo apt install php7.2 libapache2-mod-php7.2 php7.2-mysql php-common php7.2-cli php7.2-common php7.2-json php7.2-opcache php7.2-readline
-
 sudo a2enmod php7.2
-
 sudo systemctl restart apache2
 ```
 
@@ -17,18 +15,18 @@ sudo systemctl restart apache2
 
 ```bash
 php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-
 php -r "if (hash_file('sha384', 'composer-setup.php') === '48e3236262b34d30969dca3c37281b3b4bbe3221bda826ac6a9a62d6444cdb0dcd0615698a5cbe587c3f0fe57a54d8f5') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
-
 sudo php composer-setup.php
 ```
 
-^-- note that earlier NodeRED install created a .config folder with very restricted permissions, hence the sudo, but I'd be concerned this may cause problems later. Reset ownwership of ~/.composer folder.
+^-- note that earlier NodeRED install created a .config folder with very restricted permissions, and composer wouldn't install without the `sudo`, but I'd be concerned this may cause problems later.
 
-```bash
-sudo chown jonathan:jonathan -R ~/.composer
-sudo chmod 744 -R ~/.composer
-```
+>See note above!! When running `composer update` in a later step, I found it was unable to write to its own cache folder in my home folder, since `.composer` was now owned by root. (Presumably a result of the earlier `sudo` command?) Reset ownwership of folder as follows, and it now runs correctly.
+>
+>```bash
+>sudo chown jonathan:jonathan -R ~/.composer
+>sudo chmod 644 -R ~/.composer
+>```
 
 To enable composer to run globally:
 
@@ -72,11 +70,10 @@ sudo apt-get install php7.2-curl php7.2-gd php7.2-intl php7.2-mbstring php7.2-op
 
 sudo apt-get install sqlite3
 sudo apt-get install php7.2-sqlite3
-
 cd /etc/php/7.2/apache2
 sudo nano php.ini
 ```
-^- *Later in install process, realised SQLite was missed...*
+^- *Later in install process, realised SQLite was missed and it should probably have been installed at this stage. Note the edits to `php.ini` below...*
 
 Uncomment the following lines in php.ini
 
@@ -218,4 +215,41 @@ sudo apt install python-certbot-apache
 sudo certbot --apache -d bolt.example.com
 ```
 
-Confirm config in `bolt-le-ssl.conf`.
+Confirm config in `bolt-le-ssl.conf`. A few related notes here -> https://github.com/jonathancraddock/NodeRED-Apache-ReverseProxy and copied the modeified config below. I specified slightly more relaxed ciphers which means the site should be accessible to some slightly older versions of IE and Safari. Still scoring "A+" in the Globalsign SSL Checker, although the cipher score has dropped to 90%. :-(
+
+```bash
+<IfModule mod_ssl.c>
+<VirtualHost *:443>
+
+        ServerAdmin webmaster@localhost
+        ServerName bolt.example.com
+
+        SSLEngine on
+        SSLHonorCipherOrder on
+        SSLCompression off
+
+        SSLOpenSSLConfCmd Protocol "-ALL, TLSv1.2"
+        SSLProtocol -all +TLSv1.2
+        SSLOptions +FakeBasicAuth +ExportCertData +StrictRequire
+        SSLCipherSuite ALL:+HIGH:!ADH:!EXP:!SSLv2:!SSLv3:!MEDIUM:!LOW:!NULL:!aNull
+
+        Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        Header always set X-Frame-Options SAMEORIGIN
+        Header always set X-Content-Type-Options nosniff
+
+        DocumentRoot /var/www/bolt/public
+
+        <Directory "/var/www/bolt/public">
+          AllowOverride All
+        </Directory>
+
+        ErrorLog ${APACHE_LOG_DIR}/error.log
+        CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+SSLCertificateFile /etc/letsencrypt/live/bolt.example.com/fullchain.pem
+SSLCertificateKeyFile /etc/letsencrypt/live/bolt.example.com/privkey.pem
+Include /etc/letsencrypt/options-ssl-apache.conf
+
+</VirtualHost>
+</IfModule>
+```
