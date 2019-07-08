@@ -64,6 +64,28 @@ See: https://docs.bolt.cm/configuration/menus
 
 Noticed that the "footer" does not stick to the bottom of the page when there is insufficient content to push it down. The solution suggested here appears to work well: https://philipwalton.github.io/solved-by-flexbox/demos/sticky-footer/
 
-Incorporated this apprach in: /partials/_master.twig
+Incorporated their apprach in `/partials/_master.twig` and added the following CSS to `/css/theme.css`.
 
+```css
+/* Push footer to bottom of window if content less than full height */
+.Site { display: flex; min-height: 100vh; flex-direction: column; }
+.Site-content { flex: 1; }
+```
 
+### Linking to CSS and JS
+
+Example (highlight.js) of linking to CSS and JS assets from Twig template.
+
+```html
+<link rel="stylesheet" href="{{ asset('css/solarized-light.css', 'theme') }}">
+<script src="{{ asset('js/highlight.pack.js', 'theme') }}"></script>
+```
+
+Didn't like the width of the grey border around the pre-formatted code, so added this:
+
+```css
+/* Reduce grey border on highlight.js code blocks */
+.content pre {
+    padding: 0.3em;
+}
+```
