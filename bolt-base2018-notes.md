@@ -60,6 +60,34 @@ It's the same as the navbar menu, but the dropdown is removed from the second me
 
 See: https://docs.bolt.cm/configuration/menus
 
+Annoyingly, the `is-fixed-top` property of the navbar stops the hamburger menu from scrolling and with half a dozen entries the default Android keyboard obscures the search box.
+
+Experimenting with a simple jQuery function, below. Gave the navbar and burger an id.
+
+```html
+<nav id="navbar" class="navbar is-fixed-top is-primary" role="navigation" aria-label="main navigation">
+...
+<span id="hamburger" class="navbar-burger" data-target="navbar-toggle">
+```
+
+And use the following Javascript/jQuery to allow the navbar to scroll off the screen when the hamburger menu is open. The `scrollTop` feels like a bit of a compromise, but required to avoid a manual scroll after opening the menu.
+
+```javascript
+$(document).ready(function() {
+
+// Un-fix navbar when burger menu is open
+  $('#hamburger').click(function() {
+    if ( $('#navbar').hasClass('is-fixed-top') ) {
+      $('html, body').animate({ scrollTop: 0 }, 'fast');
+      $('#navbar').removeClass('is-fixed-top');
+    } else {
+      $('#navbar').addClass('is-fixed-top');
+    };    
+  });
+
+});
+```
+
 ### Footer
 
 Noticed that the "footer" does not stick to the bottom of the page when there is insufficient content to push it down. The solution suggested here appears to work well: https://philipwalton.github.io/solved-by-flexbox/demos/sticky-footer/
@@ -86,6 +114,6 @@ Didn't like the width of the grey border around the pre-formatted code, so added
 ```css
 /* Reduce grey border on highlight.js code blocks */
 .content pre {
-    padding: 0.3em;
+    padding: 1px;
 }
 ```
