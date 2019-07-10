@@ -1,4 +1,4 @@
-## Some notes on Bolt Base-2018 them
+## Some notes on Bolt Base-2018 theme
 
 The Base-2018 theme is a nice looking default template. The following are some notes and memory jogs for future reference.
 
@@ -117,3 +117,49 @@ Didn't like the width of the grey border around the pre-formatted code, so added
     padding: 1px;
 }
 ```
+
+### Launch a full-size image into a Modal
+
+Experimental - but I think it could be useful. The scenario is that you place various (multiple) "thumbnail" images into the text of a Bolt entry, page, etc. Give the thumbnail a class of `popimg`. A jQuery function launches the full image into a Modal if the thumbnail is clicked.
+
+```javascript
+// Open the "full" image of a thumbnail inside a modal
+  $('.popimg').click(function() {
+    var sourceImg = $(this).attr("src");
+    var modalImg = "/files"+sourceImg.substr(sourceImg.indexOf("c/")+1);
+    $('img#modalsrc').attr("src",modalImg);
+    $('div.modal').addClass('is-active');
+  });
+```
+
+A simple CSS edit give the pointer its usual (finger) behaviour.
+
+```css
+/* Treat any image of class 'popimg' as if it were a link */
+img.popimg {
+    cursor: pointer;
+}
+```
+
+And the empty modal is place directly beneath the `content` DIV in `index.twig`.
+
+```html
+<div class="content">
+                    
+<div class="modal">
+  <div class="modal-background"></div>
+    <div class="modal-content">
+      <p class="image is-4by3">
+        <img id="modalsrc" src="" alt="">
+      </p>
+    </div>
+  <button class="modal-close is-large" aria-label="close"></button>
+</div>
+```
+
+The string has to be manipulated slightly to substitute `/thumbs/200x125c/` with the path `/files/`. The pixel dimensions will often be different, but it will always end with a `c/`.
+
+Hence...  
+`<p><img alt="" class="popimg" src="/thumbs/200x125c/2019-07/allyourbasecats.jpg" /></p>`  
+...will launch as...  
+`/files/2019-07/allyourbasecats.jpg`.
