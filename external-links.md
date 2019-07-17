@@ -9,7 +9,7 @@ Scenario: embed neat looking product links into a Bolt site, eg/ example.com/pro
 
 Every link is "The Girl with the Dragon Tattoo", in four different regions.
 
-#### /links/.htaccess
+### /links/.htaccess
 
 Seemed better to leave Bolt's own `.htaccess` file alone and create a new one in a subfolder. I'm testing with a subfolder `./public/links`.
 
@@ -29,7 +29,7 @@ RewriteRule ^(.*) /404 [QSA,L]
 
 I believe the rewrite rules are reprocessed with every change, and was initially frustrated by my "catch-all" rule killing the rule above because it caught every URL as soon as it was rewritten. Introducing the rewrite condition and searching for the "prod" query appears to have sorted that out. The catch-all now only applies to un-rewritten URLs.
 
-#### /links/locale.php
+### /links/locale.php
 
 > Still a work in progress...
 
@@ -43,8 +43,10 @@ $product = $_GET["prod"];
 
 The function `clientip()` is one I've used before and appears to be fairly reliable. I've written my own API in Node-Red to return me a two letter country code for any IP address. There are plenty available, but here are two free-ish examples:
 
-* https://ipinfodb.com/api allows 2 queries per second on their free tier and you can avoid hitting that by introducing a 500ms delay to each query.
+* https://ipinfodb.com/api allows 2 queries per second on their free tier.
 * https://ipinfo.io/ allows 1000 queries per day on their demo tier.
+
+The client location should be written to a cookie and re-read, to reduce the number/frequency of API calls.
 
 ```php
 function clientip()
@@ -65,11 +67,11 @@ function clientip()
 }
 ```
 
-Having obtained the client's IP, looked up the geographic location (needs translating to the domain suffix) and got the product code, some sort of redirect is required:
+Having obtained the client's IP, and looked up the geographic location (which will require translating to the domain suffix) and got the product code, some sort of redirect is presumably required:
 
 ```php
 header("Location: https://www.amazon.".$suffix."/dp/".$prod);
 die();
 ```
 
-It's obviously slightly more complicated than this. Not all Amazon "/dp" references are numeric, for example.
+It's obviously slightly more complicated than this. Not all Amazon "/dp" references are numeric, for example. (Merely a proof of concept at this stage.)
