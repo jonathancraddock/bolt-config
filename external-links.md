@@ -70,8 +70,23 @@ function clientip()
 Having obtained the client's IP, and looked up the geographic location (which will require translating to the domain suffix) and got the product code, some sort of redirect is presumably required:
 
 ```php
-header("Location: https://www.amazon.".$suffix."/dp/".$prod);
+header("Location: https://www.amazon.".$suffix."/dp/".$product);
 die();
 ```
 
 It's obviously slightly more complicated than this. Not all Amazon "/dp" references are numeric, for example. (Merely a proof of concept at this stage.)
+
+For demo purposes, switching NordVPN between UK and US, the following code redirects correctly to either amazon.com or amazon.co.uk.
+
+```php
+switch ($locale) {
+  case "GB":
+    $suffix=".co.uk";
+    break;
+  default:
+    $suffix=".com";
+}
+
+header("Location: https://www.amazon".$suffix."/dp/".$product);
+die();
+```
