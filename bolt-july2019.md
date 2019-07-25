@@ -98,6 +98,8 @@ Restart Apache.
 
 `sudo systemctl restart apache2`
 
+> If it's not installed already, my also need ZIP: `apt-get install zip unzip`
+
 ## New Bolt Project / Update with Composer
 
 Navigate to "parent" folder, in this case:
