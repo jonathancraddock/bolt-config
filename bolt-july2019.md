@@ -148,7 +148,7 @@ sudo chown jonathan:www-data -R bolt
 ```
 
 FOOTNOTE:
-Composer appears to be failing without a swapfile.
+Composer appears to be failing without a swap file.
 
 ```bash
 sudo /bin/dd if=/dev/zero of=/var/swap.1 bs=1M count=1024
@@ -156,7 +156,9 @@ sudo /sbin/mkswap /var/swap.1
 sudo /sbin/swapon /var/swap.1
 sudo chmod 0600 /var/swap.1
 ```
-  
+
+> This is a TEMPORARY swap file, you could make it permanent, but note that many "SSD based" hosting providers don't like swap files...
+
 Update Bolt install with composer:
 
 ```bash
