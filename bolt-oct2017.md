@@ -47,6 +47,14 @@ sudo chmod 0600 /var/swap.1
 
 Composer will now run globally.
 
+```
+/var/www/bolt$ composer update
+Loading composer repositories with package information
+Updating dependencies (including require-dev)
+Killed
+```
+^- what I was seeing without a swapfile.
+
 ## Bolt Prerequisites
 
 Some additional PHP and Sqlite modules:
